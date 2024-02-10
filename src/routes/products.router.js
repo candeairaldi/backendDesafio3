@@ -1,5 +1,6 @@
-const express = require('express');
-const ProductManager = require('../productManager');
+import express from 'express';
+import ProductManager from '../productManager.js';
+
 const productRouter = express.Router();
 const productManager = new ProductManager();
 
@@ -54,7 +55,8 @@ productRouter.put('/:pid', (req, res) => {
 productRouter.delete('/:pid', (req, res) => {
   const productId = req.params.pid;
   productManager.deleteProduct(productId);
+
   res.json({ message: 'Product deleted successfully' });
 });
 
-module.exports = productRouter;
+export default productRouter;

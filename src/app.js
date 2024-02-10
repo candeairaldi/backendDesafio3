@@ -1,30 +1,32 @@
-const express = require('express');
-const exphbs = require('express-handlebars').create();
-const http = require('http');
-const path = require('path');
-const socketIO = require('socket.io');
-const viewsRouter = require('./routes/views.router');
-const realtimeProductsViewRouter = require('./routes/realtimeProductsView.router');
+import { fileURLToPath } from "url"; 
+import { dirname } from "path"; 
+import express from "express";
+import path from 'path'
+import handlebars from 'express-handlebars'
+import { Server } from "socket.io";
+import { createServer } from 'http';
+import viewsRouter from './routes/views.router.js'
+import cartRouter from './routes/carts.router.js'
+import productRouter from './routes/products.router.js'
 
-const productRouter = require('./routes/products.router');
-const cartRouter = require('./routes/carts.router');
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+global.__dirname = __dirname;
 
 const app = express();
-const port = 8080;
-
-// Configuración de Handlebars
-app.engine('handlebars', exphbs.engine);
-app.set('view engine', 'handlebars');
-app.set('views', path.join(__dirname, 'src', 'views'));
-
-
-// Crear servidor HTTP
-const server = http.createServer(app);
+const port = 3000;
 
 // Middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.json());  //interpretacion de json al recibir del post
+app.use(express.urlencoded({ extended: true }));  //lee lo par
+app.use(express.static(path.join(__dirname, '/public')));
+
+// Configuración de Handlebars
+app.engine('handlebars', handlebars.engine());
+app.set('views', __dirname + '/views');
+app.set('view engine', 'handlebars');
 
 // Rutas de la API
 app.use('/api/products', productRouter);
@@ -32,11 +34,16 @@ app.use('/api/carts', cartRouter);
 
 // Rutas de las vistas y sockets
 app.use('/', viewsRouter);
-app.use('/realtimeproducts', realtimeProductsViewRouter);
+
+
+//crear servidor HTTP
+const httpServer = createServer(app);
 
 // Configuración de Socket.io
-const io = require('socket.io')(server);
-app.set('socketio', io); // Guardar io en el objeto de la aplicación
+const  io = new Server(httpServer);
+
+// Guardar io en el objeto de la aplicación
+app.set('socketio', io); 
 
 io.on('connection', (socket) => {
   console.log('Usuario conectado');
@@ -57,7 +64,10 @@ io.on('connection', (socket) => {
   });
 });
 
-// Iniciar servidor HTTP
-server.listen(port, () => {
-  console.log(`El servidor está escuchando en ${port}`);
-});
+httpServer.listen(port, () => console.log(`server running on port ${port}`));
+
+
+// Importar ProductManager y crear instancia pasando 'app' como parámetro
+import ProductManager from './productManager.js';
+
+const productManager = new ProductManager(app);

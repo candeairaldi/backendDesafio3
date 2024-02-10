@@ -1,9 +1,16 @@
-const express = require('express');
+import express from 'express';
+import { ProductManager } from '../productManager'
+
+
 const router = express.Router();
+const productManager = new ProductManager();
 
 // Ruta para la vista de productos en tiempo real
 router.get('/', (req, res) => {
-  res.render('realtimeProducts', { products });
+  const products = productManager.getProducts();
+  res.render('realtimeProducts', { 
+      products 
+  });
 });
 
-module.exports = router;
+export default router

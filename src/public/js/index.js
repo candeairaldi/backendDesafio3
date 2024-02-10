@@ -30,6 +30,16 @@ socket.on ("products", products => {
     }) 
 })
 
+// Escuchar al evento 'response' del servidor
+socket.on('response', (response) => {
+    if(response.status === 'success') {
+        document.getElementById('responseContainer').innerHTML = `<p class="success">${response.message}</p>`;
+    } else {
+        document.getElementById('responseContainer').innerHTML = `<p class="error">${response.message}</p>`;
+    }
+});    
+
+// Capturar el envío del form de nuevo prod y emitir un evento al servidor
 document.getElementById("addNewProduct").addEventListener("submit", (event) => {
     event.preventDefault()
 
@@ -41,22 +51,19 @@ document.getElementById("addNewProduct").addEventListener("submit", (event) => {
         stock: document.getElementById('stock').value,
         thumbnail: document.getElementById('thumbnail').value
     })
+    // Limpiar el formulario después de enviar los datos
     event.target.reset();
 });
 
+// Capturar el envío del form de nuevo prod y emitir un evento al servidor
 document.getElementById("deleteProduct").addEventListener("submit", (event) => {
     event.preventDefault()
     const pId = document.querySelector("#id").value
     console.log(pId)
     socket.emit("deleteProduct" ,pId )
+
+    // Limpiar el formulario después de enviar los datos
     event.target.reset();
 
 })
 
-socket.on('response', (response) => {
-    if(response.status === 'success') {
-        document.getElementById('responseContainer').innerHTML = `<p class="success">${response.message}</p>`;
-    } else {
-        document.getElementById('responseContainer').innerHTML = `<p class="error">${response.message}</p>`;
-    }
-});    

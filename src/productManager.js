@@ -1,13 +1,14 @@
-const fs = require('fs').promises;
-const path = require('path');
-const { io } = require('./app'); // Importar el objeto 'io' de app.js
+import fs from 'fs/promises';
+import path from 'path';
 
-class ProductManager {
-  constructor() {
+export class ProductManager {
+  constructor(app) {
+    this.app = app;
     this.products = [];
     this.carts = [];
-    this.filePath = path.join(__dirname, 'data', 'products.json');
-    this.cartsFilePath = path.join(__dirname, 'data', 'carts.json');
+    const __dirname = path.dirname(new URL(import.meta.url).pathname);
+    this.filePath = path.join(__dirname, '', 'data', 'products.json');
+    this.cartsFilePath = path.join(__dirname,'', 'data', 'carts.json');
     this.initialize();
   }
 
@@ -50,7 +51,7 @@ class ProductManager {
     this.saveProductsToFile();
 
     // Emitir evento de nuevo producto a través de socket.io
-    io.emit('newProduct', product);
+    this.app.get('socketio').emit('newProduct', product);
 
     return product;
   }
@@ -84,7 +85,7 @@ class ProductManager {
     this.saveProductsToFile();
 
     // Emitir evento de eliminación de producto a través de socket.io
-    io.emit('deleteProduct', deletedProduct.id);
+    this.app.get ('socketio').emit('deleteProduct', deletedProduct.id);
 
     return deletedProduct;
   }
@@ -100,4 +101,4 @@ class ProductManager {
   }
 }
 
-module.exports = ProductManager;
+export default ProductManager;

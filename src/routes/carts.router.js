@@ -1,6 +1,6 @@
 // cart.router.js
-const express = require('express');
-const ProductManager = require('../productManager');
+import express from 'express';
+import { ProductManager } from '../productManager.js';
 const cartRouter = express.Router();
 const productManager = new ProductManager();
 
@@ -12,7 +12,7 @@ cartRouter.get('/:cid', (req, res) => {
   if (cart) {
     res.json(cart);
   } else {
-    res.status(404).json({ error: 'Cart not found' });
+    res.status(404).json({ error: 'Cart not found' }); 
   }
 });
 
@@ -50,4 +50,4 @@ cartRouter.post('/:cid/product/:pid', (req, res) => {
   res.json({ message: 'Product added to cart successfully' });
 });
 
-module.exports = cartRouter;
+export default cartRouter;
